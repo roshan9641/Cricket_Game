@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Bat Ball Stump Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f9;
+            font-family: Arial, sans-serif;
+        }
+        
+        .game-container {
+            text-align: center;
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 350px;
+        }
+
+        h1 {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        
+        button {
+            background-color: #ffffff;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 10px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        button img {
+            width: 50px;
+            height: 70px;
+        }
+
+       
+        .choice-display {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .choice-display img {
+            width: 50px;
+            height: 70px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+       
+        .result-message {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: white;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            width: 110px;
+            margin: 10px auto;
+        }
+        
+        .win { background-color: #28a745; }
+        .lose { background-color: #dc3545; }
+        .tie { background-color: #ffc107; }
+
+       
+        #score {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #007bff;
+            margin-top: 10px;
+        }
+
+        
+        .reset-btn {
+            margin-top: 15px;
+            padding: 8px 16px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background-color: #cc0000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <h1>Bat Ball Stump Game</h1>
+        
+       
+        <button onclick="
+            let computerChoice = genrateComputerChoice();
+            let result = getResult('Bat', computerChoice);
+            showResult('Bat', computerChoice, result);
+        ">
+            <img src="/Images/bat.jpg" alt="Bat Image">
+        </button>
+
+        <button onclick="
+             computerChoice = genrateComputerChoice();
+             result = getResult('Ball', computerChoice);
+            showResult('Ball', computerChoice, result);
+        ">
+            <img src="/Images/ball.jpg" alt="Ball Image">
+        </button>
+
+        <button onclick="
+             computerChoice = genrateComputerChoice();
+             result = getResult('Stump', computerChoice);
+            showResult('Stump', computerChoice, result);
+        ">
+            <img src="/Images/stump.jpg" alt="Stump Image">
+        </button>
+
+        
+        <div class="choice-display">
+            <div>
+                <p><strong>Your Choice</strong></p>
+                <img id="user-choice" src="/Images/bat.jpg" alt="User choice">
+            </div>
+            <div>
+                <p><strong>Computer Choice</strong></p>
+                <img id="computer-choice" src="/Images/bat.jpg" alt="Computer choice">
+            </div>
+        </div>
+
+        
+        <div id="result-message" class="result-message tie">Tie</div>
+
+        
+        <h3 id="score">Score: Won: 0, Lost: 0, Tie: 0</h3>
+
+       
+        <button class="reset-btn" onclick="
+            localStorage.clear();
+            resetScore();
+        ">Reset</button>
+    </div>
+
+    <script>
+        let scoreStr = localStorage.getItem('Score');
+        let score;
+        resetScore(scoreStr);
+        
+        function resetScore(scoreStr) {
+            score = scoreStr ? JSON.parse(scoreStr) : { win: 0, lost: 0, tie: 0 };
+            score.displayScore = function() {
+                return `Score: Won: ${score.win}, Lost: ${score.lost}, Tie: ${score.tie}`;
+            };
+            showResult();
+        }
+
+        function genrateComputerChoice() {
+            const choices = ['Bat', 'Ball', 'Stump'];
+            return choices[Math.floor(Math.random() * choices.length)];
+        }
+
+        function getResult(userMove, computerMove) {
+            if (userMove === computerMove) {
+                score.tie++;
+                return "It's a Tie";
+            }
+            if (
+                (userMove === 'Bat' && computerMove === 'Ball') ||
+                (userMove === 'Ball' && computerMove === 'Stump') ||
+                (userMove === 'Stump' && computerMove === 'Bat')
+            ) {
+                score.win++;
+                return "You Won";
+            }
+            score.lost++;
+            return "Computer Won";
+        }
+
+        function showResult(userMove, computerMove, result) {
+            if (userMove) {
+                document.getElementById('user-choice').src = `/Images/${userMove.toLowerCase()}.jpg`;
+            }
+            if (computerMove) {
+                document.getElementById('computer-choice').src = `/Images/${computerMove.toLowerCase()}.jpg`;
+            }
+
+            const resultMessage = document.getElementById('result-message');
+            if (result) {
+                resultMessage.className = `result-message ${result.includes('Won') ? 'win' : result.includes('Tie') ? 'tie' : 'lose'}`;
+                resultMessage.innerText = result;
+            }
+            
+            document.getElementById('score').innerText = score.displayScore();
+            localStorage.setItem('Score', JSON.stringify(score));
+        }
+    </script>
+</body>
+
+</html>
